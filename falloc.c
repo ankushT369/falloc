@@ -1,19 +1,27 @@
 #include "falloc.h"
 
-enum alloc_type_e : uint64_t {none = 0, linear, stack, pool,};
+typedef enum alloc_type_e : uint64_t {none = 0, linear, stack, pool,} alloc_type_e;
 
+typedef struct memory_address {} memory_address;
 
 struct stack_allocate_t {
-         
+    alloc_type_e alloc_type;
+    alignment_t alignment;
+    memory_address top_pointer;
+    memory_address mem_start;
+    memory_address mem_end;
+    uint64_t stack_size;
+    s_allocate_t *parent;
 };
+
+typedef struct align_block_t {
+     
+} align_block_t;
 
 typedef struct align_block_create_info {
     s_allocate_t *parent; // ???
-    // The metadata size
     uint64_t allocator_size;
-    // User-defined size allocation
     uint64_t mem_size;
-    // User-defined alignment
     alignment_t aligned_value;
 } align_block_create_info;
 
