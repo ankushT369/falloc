@@ -7,6 +7,8 @@
 // ALIGN macro aligns the size to its specific requirements
 #define ALIGN(_size, _alignment) ({ (_size + _alignment - 1) & ~(_alignment - 1); })
 
+#define IS_POWER_OF_2(n) (((n) != 0) && (((n) & ((n)-1)) == 0))
+
 #define ADD_UINT64_SAFE(_arg1, _arg2, _result) ({                      \
     ((_arg1) > UINT64_MAX - (_arg2)) ? 0 : ((*_result) = (_arg1) + (_arg2), 1); \
 })
@@ -25,7 +27,7 @@ typedef enum : uint64_t {
     b4k  = (1 << 14),
 } alignment_t;
 
-typedef struct stack_allocate_t s_allocate_t;
+typedef struct stack_allocate_t stack_allocate_t;
 
 
 /* 
@@ -52,12 +54,13 @@ typedef struct stack_alloc_info_t {
     alignment_t alignment;
 } stack_alloc_info_t;
 
+
 /* API for falloc */
-s_allocate_t *s_create(stack_alloc_info_t *);
-memblk s_allocate(s_allocate_t *);
-void s_destroy(stack_alloc_info_t *);
-void s_deallocate(memblk *);
-void s_deallocate_all(s_allocate_t *);
+stack_allocate_t *s_create(stack_alloc_info_t *);
+memblk stack_allocate(stack_allocate_t *, uint64_t);
+void stack_destroy(stack_alloc_info_t *);
+void stack_deallocate(memblk *);
+void stack_deallocate_all(stack_allocate_t *);
 
 
 #endif //FALLOC_H
