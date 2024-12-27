@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 static inline aligned_block_t create_aligned_block(align_block_create_info_t *block) 
 {
@@ -50,7 +51,8 @@ static inline aligned_block_t create_aligned_block(align_block_create_info_t *bl
 }
 
 
-memblk internal_alloc(stack_allocate_t *alloc, uint64_t size) {
+memblk internal_alloc(stack_allocate_t *alloc, uint64_t size)
+{
     uint64_t aligned_size = ALIGN(size, alloc -> alignment);
 
     memblk allocated_address_block;
@@ -59,6 +61,8 @@ memblk internal_alloc(stack_allocate_t *alloc, uint64_t size) {
 
     if(__builtin_expect((next_head.index) > (alloc -> mem_end.index), false))
     {
+        printf("Error4");
+        exit(EXIT_FAILURE);
         // Out of memory
     }
 
@@ -93,13 +97,14 @@ stack_allocate_t *stack_create(stack_alloc_info_t *info)
     return alloc;
 }
 
+
 memblk stack_allocate(stack_allocate_t *alloc, uint64_t size)
 {
     if(alloc -> alloc_type == stack) {
         return internal_alloc(alloc, size);
     }
     else {
-
+        
     }
     
     memblk null_mem;
@@ -107,4 +112,19 @@ memblk stack_allocate(stack_allocate_t *alloc, uint64_t size)
     null_mem.size = 0;
 
     return null_mem;
+}
+
+
+void stack_destroy(stack_allocate_t *destroy_block)
+{
+    if(destroy_block -> alloc_type == stack) {
+        free(destroy_block);    
+        return ;
+    }
+    else {
+        
+    } 
+
+    free(destroy_block);
+    return ;
 }

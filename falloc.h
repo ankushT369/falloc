@@ -12,7 +12,7 @@
 })
 
 
-typedef enum : uint64_t {
+typedef enum {
     b4   = (1 << 2),
     b8   = (1 << 3),
     b16  = (1 << 4),
@@ -26,7 +26,7 @@ typedef enum : uint64_t {
 } alignment_t;
 
 //typedef struct stack_allocate_t stack_allocate_t;
-typedef enum alloc_type_e : uint64_t {none = 0, linear, stack, pool,} alloc_type_e;
+typedef enum alloc_type_e {none = 0, linear, stack, pool,} alloc_type_e;
 
 typedef struct memory_address
 {
@@ -75,6 +75,7 @@ typedef struct align_block_create_info_t
     alignment_t alignment;
 } align_block_create_info_t;
 
+
 /* 
  * This is a memblk struct returned 
  * by the allocate function to store values
@@ -99,7 +100,7 @@ typedef struct stack_alloc_info_t {
 /* API for falloc */
 stack_allocate_t *stack_create(stack_alloc_info_t *);
 memblk stack_allocate(stack_allocate_t *, uint64_t);
-void stack_destroy(stack_alloc_info_t *);
+void stack_destroy(stack_allocate_t *);
 void stack_deallocate(memblk *);
 void stack_deallocate_all(stack_allocate_t *);
 

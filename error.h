@@ -1,8 +1,6 @@
-#ifndef ERROR_H
-#define ERROR_H
+#ifndef __ERROR_H__
+#define __ERROR_H__
 
 
 
-
-
-#endif // ERROR_H
+#endif // __ERROR_H__
