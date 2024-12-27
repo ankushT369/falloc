@@ -1,5 +1,6 @@
 #include "falloc.h"
 #include "error.h"
+#include "log.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -25,10 +26,17 @@ static inline aligned_block_t create_aligned_block(align_block_create_info_t *bl
 
     size_t _total_aligned_size = (size_t)total_aligned_size;
 
-    if(aligned_alloc(block -> alignment, _total_aligned_size)) {}
+    if(!aligned_alloc(block -> alignment, _total_aligned_size))
+    {
+        LOG_ERROR("Memory allocation failed!");
+        exit(EXIT_FAILURE);
+    }
+
+    void *ptr = aligned_alloc(block -> alignment, _total_aligned_size);
 
     memblk temp_blk = {
-        aligned_alloc(block -> alignment, _total_aligned_size),
+        //aligned_alloc(block -> alignment, _total_aligned_size),
+        ptr,
         total_aligned_size,
     };
 
@@ -53,6 +61,11 @@ static inline aligned_block_t create_aligned_block(align_block_create_info_t *bl
 
 memblk internal_alloc(stack_allocate_t *alloc, uint64_t size)
 {
+    if(!IS_ALIGN(size, alloc -> alignment))
+    {
+        LOG_WARN("Requested allocation size %llu bytes is not a multiple of the alignment size %u bytes. Adjusting size for proper alignment.", (unsigned long long)size, alloc -> alignment);
+    }
+
     uint64_t aligned_size = ALIGN(size, alloc -> alignment);
 
     memblk allocated_address_block;
@@ -61,9 +74,8 @@ memblk internal_alloc(stack_allocate_t *alloc, uint64_t size)
 
     if(__builtin_expect((next_head.index) > (alloc -> mem_end.index), false))
     {
-        printf("Error4");
+        LOG_ERROR("Allocated size exceeds the block size limit.");
         exit(EXIT_FAILURE);
-        // Out of memory
     }
 
     allocated_address_block.memptr = current_head.raw;
@@ -77,6 +89,13 @@ memblk internal_alloc(stack_allocate_t *alloc, uint64_t size)
 
 stack_allocate_t *stack_create(stack_alloc_info_t *info)
 {
+    //LOG_DEBUG("Error");
+    if(info -> size < 512) {
+        LOG_ERROR("Error: Requested memory size %u bytes is too small. Minimum allowed size is 512 bytes.",
+                (unsigned int)info -> size);
+        exit(EXIT_FAILURE);
+    }
+
     align_block_create_info_t align_block_info = {
         sizeof(stack_allocate_t),
         info -> size,

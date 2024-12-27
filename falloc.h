@@ -7,6 +7,8 @@
 // ALIGN macro aligns the size to its specific requirements
 #define ALIGN(_size, _alignment) ({ (_size + _alignment - 1) & ~(_alignment - 1); })
 
+#define IS_ALIGN(_size, _alignment) (((_size) & ((_alignment) - 1)) == 0)
+
 #define ADD_UINT64_SAFE(_arg1, _arg2, _result) ({                      \
     ((_arg1) > UINT64_MAX - (_arg2)) ? 0 : ((*_result) = (_arg1) + (_arg2), 1); \
 })
