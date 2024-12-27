@@ -41,7 +41,7 @@ TEST_F(StackAllocateTest, StackAllocateFail) {
 
     memblk allocated_block = stack_allocate(alloc, 2048);
     
-    EXPECT_EQ(allocated_block.memaddr, 95985963916288);  // Allocation should fail
+    EXPECT_EQ(allocated_block.memptr, nullptr);  // Allocation should fail
 }
 
 

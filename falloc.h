@@ -1,6 +1,6 @@
 /* This code implements the stack allocation */
-#ifndef FALLOC_H
-#define FALLOC_H
+#ifndef __FALLOC_H__
+#define __FALLOC_H__
 
 #include <stdint.h>
 
@@ -81,21 +81,17 @@ typedef struct align_block_create_info_t
  *
  */
 typedef struct memblk {
-    // pointer to the empty memory
     union {
         void* memptr;
         uintptr_t memaddr;
     };
-    // size of the empty memory
     uint64_t size; 
 } memblk;
 
 /**/
 typedef struct stack_alloc_info_t {
     // p_allocator_t parent;
-    // required size by user
     uint64_t size;
-    // required alignment by user
     alignment_t alignment;
 } stack_alloc_info_t;
 
@@ -108,4 +104,4 @@ void stack_deallocate(memblk *);
 void stack_deallocate_all(stack_allocate_t *);
 
 
-#endif //FALLOC_H
+#endif //__FALLOC_H__
