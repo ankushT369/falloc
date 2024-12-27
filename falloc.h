@@ -7,8 +7,6 @@
 // ALIGN macro aligns the size to its specific requirements
 #define ALIGN(_size, _alignment) ({ (_size + _alignment - 1) & ~(_alignment - 1); })
 
-#define IS_POWER_OF_2(n) (((n) != 0) && (((n) & ((n)-1)) == 0))
-
 #define ADD_UINT64_SAFE(_arg1, _arg2, _result) ({                      \
     ((_arg1) > UINT64_MAX - (_arg2)) ? 0 : ((*_result) = (_arg1) + (_arg2), 1); \
 })
@@ -27,8 +25,55 @@ typedef enum : uint64_t {
     b4k  = (1 << 14),
 } alignment_t;
 
-typedef struct stack_allocate_t stack_allocate_t;
+//typedef struct stack_allocate_t stack_allocate_t;
+typedef enum alloc_type_e : uint64_t {none = 0, linear, stack, pool,} alloc_type_e;
 
+typedef struct memory_address
+{
+    union
+    {
+        void *raw;
+        uintptr_t index;
+    };
+} memory_address;
+
+
+static inline memory_address add_memeory_address(memory_address address, 
+                                                 uint64_t size)
+{
+    address.index = address.index + size;
+    return address;
+}
+
+
+typedef struct stack_allocate_t
+{
+    alloc_type_e alloc_type;
+    alignment_t alignment;
+    memory_address top_pointer;
+    memory_address mem_start;
+    memory_address mem_end;
+    uint64_t stack_size;
+    //stack_allocate_t *parent;
+} stack_allocate_t;
+
+
+typedef struct aligned_block_t
+{
+    memory_address base_address;
+    uint64_t total_size;
+    memory_address usable_address;
+    uint64_t usable_size;
+} aligned_block_t;
+
+
+typedef struct align_block_create_info_t
+{
+    //stack_allocate_t *parent; // ???
+    uint64_t allocator_size;
+    uint64_t mem_size;
+    alignment_t alignment;
+} align_block_create_info_t;
 
 /* 
  * This is a memblk struct returned 
@@ -56,7 +101,7 @@ typedef struct stack_alloc_info_t {
 
 
 /* API for falloc */
-stack_allocate_t *s_create(stack_alloc_info_t *);
+stack_allocate_t *stack_create(stack_alloc_info_t *);
 memblk stack_allocate(stack_allocate_t *, uint64_t);
 void stack_destroy(stack_alloc_info_t *);
 void stack_deallocate(memblk *);

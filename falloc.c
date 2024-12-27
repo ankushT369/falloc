@@ -5,57 +5,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-
-typedef enum alloc_type_e : uint64_t {none = 0, linear, stack, pool,} alloc_type_e;
-
-typedef struct memory_address
-{
-    union
-    {
-        void *raw;
-        uintptr_t index;
-    };
-} memory_address;
-
-
-static inline memory_address add_memeory_address(memory_address address, 
-                                                 uint64_t size)
-{
-    address.index = address.index + size;
-    return address;
-}
-
-
-struct stack_allocate_t
-{
-    alloc_type_e alloc_type;
-    alignment_t alignment;
-    memory_address top_pointer;
-    memory_address mem_start;
-    memory_address mem_end;
-    uint64_t stack_size;
-    //stack_allocate_t *parent;
-};
-
-
-typedef struct aligned_block_t
-{
-    memory_address base_address;
-    uint64_t total_size;
-    memory_address usable_address;
-    uint64_t usable_size;
-} aligned_block_t;
-
-
-typedef struct align_block_create_info_t
-{
-    //stack_allocate_t *parent; // ???
-    uint64_t allocator_size;
-    uint64_t mem_size;
-    alignment_t alignment;
-} align_block_create_info_t;
-
-
 static inline aligned_block_t create_aligned_block(align_block_create_info_t *block) 
 {
     const uint64_t aligned_alloc_size = ALIGN(block -> allocator_size,
@@ -152,5 +101,10 @@ memblk stack_allocate(stack_allocate_t *alloc, uint64_t size)
     else {
 
     }
+    
+    memblk null_mem;
+    null_mem.memptr = NULL;
+    null_mem.size = 0;
 
+    return null_mem;
 }
