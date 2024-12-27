@@ -63,7 +63,8 @@ memblk internal_alloc(stack_allocate_t *alloc, uint64_t size)
 {
     if(!IS_ALIGN(size, alloc -> alignment))
     {
-        LOG_WARN("Requested allocation size %llu bytes is not a multiple of the alignment size %u bytes. Adjusting size for proper alignment.", (unsigned long long)size, alloc -> alignment);
+        LOG_WARN("Requested allocation size %llu bytes is not a multiple of the alignment size %u bytes."
+                "Adjusting size for proper alignment.", (unsigned long long)size, alloc -> alignment);
     }
 
     uint64_t aligned_size = ALIGN(size, alloc -> alignment);

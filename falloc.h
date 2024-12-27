@@ -13,6 +13,12 @@
     ((_arg1) > UINT64_MAX - (_arg2)) ? 0 : ((*_result) = (_arg1) + (_arg2), 1); \
 })
 
+#define stack_create(info) _stack_create(info, __FILE__, __LINE__)
+
+#define stack_allocate(stack, size) _stack_allocate(stack, size, __FILE__, __LINE__)
+
+#define stack_destroy(stack) _stack_destroy(stack, __FILE__, __LINE__)
+
 
 typedef enum {
     b4   = (1 << 2),
@@ -83,8 +89,10 @@ typedef struct align_block_create_info_t
  * by the allocate function to store values
  *
  */
-typedef struct memblk {
-    union {
+typedef struct memblk
+{
+    union
+    {
         void* memptr;
         uintptr_t memaddr;
     };
@@ -92,7 +100,8 @@ typedef struct memblk {
 } memblk;
 
 /**/
-typedef struct stack_alloc_info_t {
+typedef struct stack_alloc_info_t
+{
     // p_allocator_t parent;
     uint64_t size;
     alignment_t alignment;
@@ -100,9 +109,9 @@ typedef struct stack_alloc_info_t {
 
 
 /* API for falloc */
-stack_allocate_t *stack_create(stack_alloc_info_t *);
-memblk stack_allocate(stack_allocate_t *, uint64_t);
-void stack_destroy(stack_allocate_t *);
+stack_allocate_t *_stack_create(stack_alloc_info_t *);
+memblk _stack_allocate(stack_allocate_t *, uint64_t);
+void _stack_destroy(stack_allocate_t *);
 void stack_deallocate(memblk *);
 void stack_deallocate_all(stack_allocate_t *);
 
