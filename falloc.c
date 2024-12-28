@@ -28,7 +28,10 @@ static inline aligned_block_t create_aligned_block(align_block_create_info_t *bl
 
     if(!aligned_alloc(block -> alignment, _total_aligned_size))
     {
+        #ifdef DEBUG
         LOG_ERROR("Memory allocation failed!");
+        #endif  //DEBUG
+
         exit(EXIT_FAILURE);
     }
 
@@ -59,12 +62,18 @@ static inline aligned_block_t create_aligned_block(align_block_create_info_t *bl
 }
 
 
-memblk internal_alloc(stack_allocate_t *alloc, uint64_t size)
+memblk internal_alloc(stack_allocate_t *alloc, 
+                      uint64_t size,
+                      const char *file,
+                      int line)
 {
     if(!IS_ALIGN(size, alloc -> alignment))
     {
-        LOG_WARN("Requested allocation size %llu bytes is not a multiple of the alignment size %u bytes."
-                "Adjusting size for proper alignment.", (unsigned long long)size, alloc -> alignment);
+        #ifdef DEBUG
+        LOG_WARN("[%s:%d] Requested allocation size %llu bytes is not a multiple of the alignment size %u bytes. "
+                 "Adjusting size for proper alignment.",
+                 file, line, (unsigned long long)size, alloc->alignment);
+        #endif  //DEBUG
     }
 
     uint64_t aligned_size = ALIGN(size, alloc -> alignment);
@@ -75,7 +84,10 @@ memblk internal_alloc(stack_allocate_t *alloc, uint64_t size)
 
     if(__builtin_expect((next_head.index) > (alloc -> mem_end.index), false))
     {
+        #ifdef DEBUG
         LOG_ERROR("Allocated size exceeds the block size limit.");
+        #endif  //DEBUG
+
         exit(EXIT_FAILURE);
     }
 
@@ -88,12 +100,16 @@ memblk internal_alloc(stack_allocate_t *alloc, uint64_t size)
 }
 
 
-stack_allocate_t *stack_create(stack_alloc_info_t *info)
+stack_allocate_t *_stack_create(stack_alloc_info_t *info,
+                                const char *file,
+                                int line)
 {
-    //LOG_DEBUG("Error");
     if(info -> size < 512) {
-        LOG_ERROR("Error: Requested memory size %u bytes is too small. Minimum allowed size is 512 bytes.",
-                (unsigned int)info -> size);
+        #ifdef DEBUG
+        LOG_ERROR("[%s:%d] Error: Requested memory size %u bytes is too small. Minimum allowed size is 512 bytes.",
+                  file, line, (unsigned int)info->size);
+        #endif  //DEBUG
+
         exit(EXIT_FAILURE);
     }
 
@@ -118,10 +134,13 @@ stack_allocate_t *stack_create(stack_alloc_info_t *info)
 }
 
 
-memblk stack_allocate(stack_allocate_t *alloc, uint64_t size)
+memblk _stack_allocate(stack_allocate_t *alloc, 
+                       uint64_t size, 
+                       const char *file, 
+                       int line)
 {
     if(alloc -> alloc_type == stack) {
-        return internal_alloc(alloc, size);
+        return internal_alloc(alloc, size, file, line);
     }
     else {
         
@@ -135,7 +154,9 @@ memblk stack_allocate(stack_allocate_t *alloc, uint64_t size)
 }
 
 
-void stack_destroy(stack_allocate_t *destroy_block)
+void _stack_destroy(stack_allocate_t *destroy_block, 
+                    const char *file, 
+                    int line)
 {
     if(destroy_block -> alloc_type == stack) {
         free(destroy_block);    
