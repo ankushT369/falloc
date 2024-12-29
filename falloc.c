@@ -2,6 +2,7 @@
 #include "error.h"
 #include "log.h"
 
+#include <string.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -155,11 +156,14 @@ memblk _stack_allocate(stack_allocate_t *alloc,
 
 
 void _stack_destroy(stack_allocate_t *destroy_block, 
+                    void **blockptr,
                     const char *file, 
                     int line)
 {
     if(destroy_block -> alloc_type == stack) {
-        free(destroy_block);    
+        free(destroy_block);
+        destroy_block = NULL;
+        *blockptr = NULL;
         return ;
     }
     else {

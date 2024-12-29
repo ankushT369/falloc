@@ -18,9 +18,9 @@
 
 #define stack_allocate(stack, size) _stack_allocate(stack, size, __FILE__, __LINE__)
 
-#define stack_destroy(stack) _stack_destroy(stack, __FILE__, __LINE__)
+#define stack_destroy(stack, blockptr) _stack_destroy(stack, blockptr, __FILE__, __LINE__)
 
-#define stack_deallocate(memblk) _stack_deallocate(memblk, __FILE__, __LINE__);
+#define stack_deallocate(mem) _stack_deallocate(mem, __FILE__, __LINE__);
 
 #define stack_deallocate_all(stack) _stack_deallocate_all(stack, __FILE__, __LINE__);
 
@@ -30,7 +30,7 @@
 
 #define stack_allocate(stack, size) _stack_allocate(stack, size, NULL, 0)
 
-#define stack_destroy(stack) _stack_destroy(stack, NULL, 0)
+#define stack_destroy(stack, blockptr) _stack_destroy(stack, blockptr, NULL, 0)
 
 #define stack_deallocate(memblk) _stack_deallocate(memblk, NULL, 0);
 
@@ -130,7 +130,7 @@ typedef struct stack_alloc_info_t
 /* API for falloc */
 stack_allocate_t *_stack_create(stack_alloc_info_t *, const char *file, int line);
 memblk _stack_allocate(stack_allocate_t *, uint64_t, const char *file, int line);
-void _stack_destroy(stack_allocate_t *, const char *file, int line);
+void _stack_destroy(stack_allocate_t *, void **blockptr, const char *file, int line);
 void _stack_deallocate(memblk *, const char *file, int line);
 void _stack_deallocate_all(stack_allocate_t *, const char *file, int line);
 
