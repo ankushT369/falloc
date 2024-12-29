@@ -134,7 +134,7 @@ stack_allocate_t *_stack_create(stack_alloc_info_t *info,
 }
 
 
-memblk _stack_allocate(stack_allocate_t *alloc, 
+memblk _stack_alloc(stack_allocate_t *alloc, 
                        uint64_t size, 
                        const char *file, 
                        int line)
@@ -180,7 +180,7 @@ void _stack_destroy(stack_allocate_t *destroy_block,
     va_end(args);  // Clean up the argument list}
 }
 
-void _stack_deallocate(stack_allocate_t *alloc, 
+void _stack_dealloc(stack_allocate_t *alloc, 
                        memblk block, 
                        const char *file,
                        int line)
@@ -202,4 +202,11 @@ void _stack_deallocate(stack_allocate_t *alloc,
         alloc -> top_pointer = checkbuffer;
     }
     
+}
+
+void _stack_dealloc_all(stack_allocate_t *alloc,
+                           const char *file,
+                           int line)
+{
+    alloc -> top_pointer = alloc ->mem_start;
 }

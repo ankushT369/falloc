@@ -17,25 +17,25 @@
 #ifdef DEBUG
 #define stack_create(info) _stack_create(info, __FILE__, __LINE__)
 
-#define stack_allocate(stack, size) _stack_allocate(stack, size, __FILE__, __LINE__)
+#define stack_alloc(stack, size) _stack_alloc(stack, size, __FILE__, __LINE__)
 
 #define stack_destroy(stack, ...) _stack_destroy(stack, __FILE__, __LINE__, __VA_ARGS__)
 
-#define stack_deallocate(stack, mem) _stack_deallocate(stack, mem, __FILE__, __LINE__);
+#define stack_dealloc(stack, mem) _stack_dealloc(stack, mem, __FILE__, __LINE__);
 
-#define stack_deallocate_all(stack) _stack_deallocate_all(stack, __FILE__, __LINE__);
+#define stack_deallo_all(stack) _stack_dealloc_all(stack, __FILE__, __LINE__);
 
 #else
 
 #define stack_create(info) _stack_create(info, NULL, 0)
 
-#define stack_allocate(stack, size) _stack_allocate(stack, size, NULL, 0)
+#define stack_alloc(stack, size) _stack_alloc(stack, size, NULL, 0)
 
 #define stack_destroy(stack, ...) _stack_destroy(stack, NULL, 0, __VA_ARGS__)
 
-#define stack_deallocate(stack, memblk) _stack_deallocate(stack, memblk, NULL, 0);
+#define stack_dealloc(stack, memblk) _stack_dealloc(stack, memblk, NULL, 0);
 
-#define stack_deallocate_all(stack) _stack_deallocate_all(stack, NULL , 0);
+#define stack_dealloc_all(stack) _stack_dealloc_all(stack, NULL , 0);
 
 #endif  // DEBUG
 
@@ -136,10 +136,10 @@ typedef struct stack_alloc_info_t
 
 /* API for falloc */
 stack_allocate_t *_stack_create(stack_alloc_info_t *, const char *file, int line);
-memblk _stack_allocate(stack_allocate_t *, uint64_t, const char *file, int line);
+memblk _stack_alloc(stack_allocate_t *, uint64_t, const char *file, int line);
 void _stack_destroy(stack_allocate_t *, const char *file, int line, ...);
-void _stack_deallocate(stack_allocate_t *, memblk, const char *file, int line);
-void _stack_deallocate_all(stack_allocate_t *, const char *file, int line);
+void _stack_dealloc(stack_allocate_t *, memblk, const char *file, int line);
+void _stack_dealloc_all(stack_allocate_t *, const char *file, int line);
 
 
 #endif //__FALLOC_H__
