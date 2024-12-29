@@ -39,7 +39,6 @@ static inline aligned_block_t create_aligned_block(align_block_create_info_t *bl
     void *ptr = aligned_alloc(block -> alignment, _total_aligned_size);
 
     memblk temp_blk = {
-        //aligned_alloc(block -> alignment, _total_aligned_size),
         ptr,
         total_aligned_size,
     };
@@ -143,9 +142,6 @@ memblk _stack_allocate(stack_allocate_t *alloc,
     if(alloc -> alloc_type == stack) {
         return internal_alloc(alloc, size, file, line);
     }
-    else {
-        
-    }
     
     memblk null_mem;
     null_mem.memptr = NULL;
@@ -156,20 +152,54 @@ memblk _stack_allocate(stack_allocate_t *alloc,
 
 
 void _stack_destroy(stack_allocate_t *destroy_block, 
-                    void **blockptr,
                     const char *file, 
-                    int line)
+                    int line,
+                    ...)
 {
-    if(destroy_block -> alloc_type == stack) {
-        free(destroy_block);
-        destroy_block = NULL;
-        *blockptr = NULL;
-        return ;
-    }
-    else {
-        
-    } 
+    va_list args;
+    va_start(args, line);  // Initialize the argument list, starting after 'line'
 
-    free(destroy_block);
-    return ;
+    // Process each pointer passed in the variadic argument list
+    while (true) {
+        void **blockptr = va_arg(args, void**); // Get the next argument (a void pointer)
+
+        // If we get a NULL pointer, stop the loop
+        if (blockptr == NULL) {
+            break;
+        }
+
+        // Free the memory and set the pointer to NULL
+        if (destroy_block->alloc_type == stack) {
+            free(destroy_block);
+            destroy_block = NULL;
+        }
+
+        *blockptr = NULL; // Nullify the pointer
+    }
+
+    va_end(args);  // Clean up the argument list}
+}
+
+void _stack_deallocate(stack_allocate_t *alloc, 
+                       memblk block, 
+                       const char *file,
+                       int line)
+{
+    memory_address checkbuffer = subs_memeory_address(alloc -> top_pointer, block.size);
+
+    if(__builtin_expect((checkbuffer.index) < (alloc -> mem_start.index), false))
+    {
+        fflush(stdout);
+        #ifdef DEBUG
+        LOG_ERROR("Deallocated size recedes the block size limit.");
+        #endif  //DEBUG
+
+        exit(EXIT_FAILURE);
+    }
+
+
+    if(checkbuffer.raw == block.memptr) {
+        alloc -> top_pointer = checkbuffer;
+    }
+    
 }

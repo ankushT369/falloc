@@ -3,6 +3,7 @@
 #define __FALLOC_H__
 
 #include <stdint.h>
+#include <stdarg.h>
 
 // ALIGN macro aligns the size to its specific requirements
 #define ALIGN(_size, _alignment) ({ (_size + _alignment - 1) & ~(_alignment - 1); })
@@ -18,9 +19,9 @@
 
 #define stack_allocate(stack, size) _stack_allocate(stack, size, __FILE__, __LINE__)
 
-#define stack_destroy(stack, blockptr) _stack_destroy(stack, blockptr, __FILE__, __LINE__)
+#define stack_destroy(stack, ...) _stack_destroy(stack, __FILE__, __LINE__, __VA_ARGS__)
 
-#define stack_deallocate(mem) _stack_deallocate(mem, __FILE__, __LINE__);
+#define stack_deallocate(stack, mem) _stack_deallocate(stack, mem, __FILE__, __LINE__);
 
 #define stack_deallocate_all(stack) _stack_deallocate_all(stack, __FILE__, __LINE__);
 
@@ -30,9 +31,9 @@
 
 #define stack_allocate(stack, size) _stack_allocate(stack, size, NULL, 0)
 
-#define stack_destroy(stack, blockptr) _stack_destroy(stack, blockptr, NULL, 0)
+#define stack_destroy(stack, ...) _stack_destroy(stack, NULL, 0, __VA_ARGS__)
 
-#define stack_deallocate(memblk) _stack_deallocate(memblk, NULL, 0);
+#define stack_deallocate(stack, memblk) _stack_deallocate(stack, memblk, NULL, 0);
 
 #define stack_deallocate_all(stack) _stack_deallocate_all(stack, NULL , 0);
 
@@ -72,6 +73,12 @@ static inline memory_address add_memeory_address(memory_address address,
     return address;
 }
 
+static inline memory_address subs_memeory_address(memory_address address, 
+                                                 uint64_t size)
+{
+    address.index = address.index - size;
+    return address;
+}
 
 typedef struct stack_allocate_t
 {
@@ -130,8 +137,8 @@ typedef struct stack_alloc_info_t
 /* API for falloc */
 stack_allocate_t *_stack_create(stack_alloc_info_t *, const char *file, int line);
 memblk _stack_allocate(stack_allocate_t *, uint64_t, const char *file, int line);
-void _stack_destroy(stack_allocate_t *, void **blockptr, const char *file, int line);
-void _stack_deallocate(memblk *, const char *file, int line);
+void _stack_destroy(stack_allocate_t *, const char *file, int line, ...);
+void _stack_deallocate(stack_allocate_t *, memblk, const char *file, int line);
 void _stack_deallocate_all(stack_allocate_t *, const char *file, int line);
 
 
