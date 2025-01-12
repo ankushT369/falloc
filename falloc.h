@@ -15,7 +15,7 @@
 })
 
 #ifdef DEBUG
-#define stack_create(info) _stack_create(info, __FILE__, __LINE__)
+#define stack_create(size, alignment) _stack_create(size, alignment, __FILE__, __LINE__)
 
 #define stack_alloc(stack, size) _stack_alloc(stack, size, __FILE__, __LINE__)
 
@@ -27,7 +27,7 @@
 
 #else
 
-#define stack_create(info) _stack_create(info, NULL, 0)
+#define stack_create(size, alignment) _stack_create(size, alignment, NULL, 0)
 
 #define stack_alloc(stack, size) _stack_alloc(stack, size, NULL, 0)
 
@@ -125,21 +125,15 @@ typedef struct memblk
     uint64_t size; 
 } memblk;
 
-/**/
-typedef struct stack_alloc_info_t
-{
-    // p_allocator_t parent;
-    uint64_t size;
-    alignment_t alignment;
-} stack_alloc_info_t;
 
-
-/* API for falloc */
-stack_allocate_t *_stack_create(stack_alloc_info_t *, const char *file, int line);
+/* stack API for falloc */
+stack_allocate_t *_stack_create(uint64_t, alignment_t, const char *file, int line);
 memblk _stack_alloc(stack_allocate_t *, uint64_t, const char *file, int line);
 void _stack_destroy(stack_allocate_t *, const char *file, int line, ...);
 void _stack_dealloc(stack_allocate_t *, memblk, const char *file, int line);
 void _stack_dealloc_all(stack_allocate_t *, const char *file, int line);
+
+/* pool API for falloc */
 
 
 #endif //__FALLOC_H__

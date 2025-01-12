@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+
 static inline aligned_block_t create_aligned_block(align_block_create_info_t *block) 
 {
     const uint64_t aligned_alloc_size = ALIGN(block -> allocator_size,
@@ -100,14 +101,15 @@ memblk internal_alloc(stack_allocate_t *alloc,
 }
 
 
-stack_allocate_t *_stack_create(stack_alloc_info_t *info,
+stack_allocate_t *_stack_create(uint64_t size,
+                                alignment_t alignment,
                                 const char *file,
                                 int line)
 {
-    if(info -> size < 512) {
+    if(size < 512) {
         #ifdef DEBUG
         LOG_ERROR("[%s:%d] Error: Requested memory size %u bytes is too small. Minimum allowed size is 512 bytes.",
-                  file, line, (unsigned int)info->size);
+                  file, line, (unsigned int)size);
         #endif  //DEBUG
 
         exit(EXIT_FAILURE);
@@ -115,8 +117,8 @@ stack_allocate_t *_stack_create(stack_alloc_info_t *info,
 
     align_block_create_info_t align_block_info = {
         sizeof(stack_allocate_t),
-        info -> size,
-        info -> alignment
+        size,
+        alignment
     };
 
     aligned_block_t block = create_aligned_block(&align_block_info);
@@ -124,7 +126,7 @@ stack_allocate_t *_stack_create(stack_alloc_info_t *info,
     stack_allocate_t *alloc = (stack_allocate_t *)block.base_address.raw;
 
     alloc -> alloc_type  = stack;
-    alloc -> alignment   = info -> alignment;
+    alloc -> alignment   = alignment;
     alloc -> top_pointer = block.usable_address;
     alloc -> mem_start   = block.usable_address;
     alloc -> mem_end     = add_memeory_address(block.usable_address, block.usable_size);
@@ -174,10 +176,10 @@ void _stack_destroy(stack_allocate_t *destroy_block,
             destroy_block = NULL;
         }
 
-        *blockptr = NULL; // Nullify the pointer
+        *blockptr = NULL;
     }
 
-    va_end(args);  // Clean up the argument list}
+    va_end(args);  
 }
 
 void _stack_dealloc(stack_allocate_t *alloc, 
